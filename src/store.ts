@@ -10,12 +10,24 @@ interface State {
   txs: Transaction[]
   initialBalance: number
   theme: Theme
+  /** Limite mensal por categoria de despesa (categoria sem limite = sem meta). */
+  budgets: Record<string, number>
+  setBudget: (category: string, limit: number | null) => void
   add: (tx: Omit<Transaction, 'id'>) => void
   update: (id: string, patch: Partial<Transaction>) => void
   remove: (id: string) => void
   markPaid: (id: string) => void
   toggleTheme: () => void
   resetDemo: () => void
+}
+
+const DEFAULT_BUDGETS: Record<string, number> = {
+  Estrutura: 4500,
+  Pessoal: 3400,
+  Tecnologia: 400,
+  Marketing: 1500,
+  Impostos: 2200,
+  Serviços: 700,
 }
 
 const uid = () => Math.random().toString(36).slice(2, 10)
@@ -26,6 +38,14 @@ export const useStore = create<State>()(
       txs: generateMock(),
       initialBalance: 12000,
       theme: 'dark',
+      budgets: { ...DEFAULT_BUDGETS },
+      setBudget: (category, limit) =>
+        set((s) => {
+          const budgets = { ...s.budgets }
+          if (limit && limit > 0) budgets[category] = limit
+          else delete budgets[category]
+          return { budgets }
+        }),
       add: (tx) =>
         set((s) => {
           if (!tx.recurring) return { txs: [...s.txs, { ...tx, id: uid() }] }
@@ -45,7 +65,7 @@ export const useStore = create<State>()(
           txs: s.txs.map((t) => (t.id === id ? { ...t, paidDate: iso(new Date()) } : t)),
         })),
       toggleTheme: () => set((s) => ({ theme: s.theme === 'dark' ? 'light' : 'dark' })),
-      resetDemo: () => set({ txs: generateMock() }),
+      resetDemo: () => set({ txs: generateMock(), budgets: { ...DEFAULT_BUDGETS } }),
     }),
     { name: 'fluxa-v1' },
   ),

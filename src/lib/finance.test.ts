@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import type { Transaction } from '../types'
 import {
+  budgetUsage,
   categoryBreakdown,
   currentBalance,
   daysUntil,
@@ -131,6 +132,38 @@ describe('totais', () => {
       { name: 'Marketing', value: 200 },
       { name: 'Estrutura', value: 150.5 },
     ])
+  })
+})
+
+describe('budgetUsage', () => {
+  const spend = (category: string, amount: number, over: Partial<Transaction> = {}) =>
+    mk({ type: 'despesa', category, amount, dueDate: '2026-10-10', ...over })
+
+  it('classifica cada categoria como ok, alerta, estourado ou sem meta', () => {
+    const txs = [
+      spend('Estrutura', 500), // 50%
+      spend('Marketing', 850), // 85%
+      spend('Pessoal', 1000), // 100%
+      spend('Tecnologia', 123), // sem meta
+    ]
+    const budgets = { Estrutura: 1000, Marketing: 1000, Pessoal: 1000 }
+    const rows = budgetUsage(txs, budgets, ['Estrutura', 'Marketing', 'Pessoal', 'Tecnologia'])
+    expect(rows.map((r) => r.state)).toEqual(['ok', 'alerta', 'estourado', 'sem-meta'])
+    expect(rows[0]).toMatchObject({ spent: 500, limit: 1000, pct: 50 })
+    expect(rows[3]).toMatchObject({ spent: 123, limit: 0, pct: 0 })
+  })
+
+  it('soma pagos e agendados do mês atual e ignora outros meses e receitas', () => {
+    const txs = [
+      spend('Estrutura', 300, { paidDate: '2026-10-11' }), // pago
+      spend('Estrutura', 200, { dueDate: '2026-10-28' }), // agendado no mês
+      spend('Estrutura', 999, { dueDate: '2026-09-10', paidDate: '2026-09-10' }), // mês anterior
+      spend('Estrutura', 999, { dueDate: '2026-11-05' }), // próximo mês
+      mk({ type: 'receita', category: 'Estrutura', amount: 999, dueDate: '2026-10-10' }),
+    ]
+    const [row] = budgetUsage(txs, { Estrutura: 1000 }, ['Estrutura'])
+    expect(row.spent).toBe(500)
+    expect(row.pct).toBe(50)
   })
 })
 

@@ -8,6 +8,7 @@ Dashboard financeiro interativo para pequenos negócios: fluxo de caixa, contas 
 - **Fluxo de caixa:** realizado vs. previsto, filtro de período (6/9/12 meses) e saldo projetado em 30/60/90 dias
 - **Contas a pagar / a receber:** CRUD, filtros (status, categoria, período, busca), dar baixa, lançamentos recorrentes e exportação CSV
 - **Categorias:** distribuição de despesas e receitas
+- **Metas:** limite mensal por categoria de despesa, com barra de progresso, alerta a partir de 80% e aviso de meta estourada
 - **Indicadores:** ticket médio, prazo médio de recebimento e inadimplência
 - Tema claro/escuro e layout responsivo
 

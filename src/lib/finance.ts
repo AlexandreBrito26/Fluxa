@@ -113,6 +113,42 @@ export function categoryBreakdown(txs: Transaction[], type: TxType) {
     .sort((a, b) => b.value - a.value)
 }
 
+export type BudgetState = 'ok' | 'alerta' | 'estourado' | 'sem-meta'
+
+export interface BudgetRow {
+  category: string
+  limit: number
+  spent: number
+  pct: number
+  state: BudgetState
+}
+
+/**
+ * Uso do orçamento no mês atual, por categoria de despesa.
+ * Conta o que já foi pago e o que está agendado para o mês.
+ * Estados: ok (<80%), alerta (80–99%), estourado (≥100%), sem-meta (sem limite).
+ */
+export function budgetUsage(
+  txs: Transaction[],
+  budgets: Record<string, number>,
+  categories: string[],
+): BudgetRow[] {
+  const key = monthOf(iso(new Date()))
+  return categories.map((category) => {
+    const spent = sum(
+      txs.filter(
+        (t) =>
+          t.type === 'despesa' && t.category === category && monthOf(t.paidDate ?? t.dueDate) === key,
+      ),
+    )
+    const limit = budgets[category] ?? 0
+    const pct = limit > 0 ? (spent / limit) * 100 : 0
+    const state: BudgetState =
+      limit <= 0 ? 'sem-meta' : pct >= 100 ? 'estourado' : pct >= 80 ? 'alerta' : 'ok'
+    return { category, limit, spent: Math.round(spent * 100) / 100, pct, state }
+  })
+}
+
 export function indicators(txs: Transaction[]) {
   const receitas = txs.filter((t) => t.type === 'receita')
   const paid = receitas.filter((t) => t.paidDate)
