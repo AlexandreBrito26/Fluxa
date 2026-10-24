@@ -36,7 +36,8 @@ h3 { font-size: 15px; font-weight: 600; margin-bottom: 12px; }
 .toolbar h3 { margin-bottom: 0; }
 
 .app { max-width: 1200px; margin: 0 auto; padding: 16px 16px 40px; }
-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px; }
+header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+.offline-pill { margin-left: 4px; }
 .brand { display: flex; align-items: center; gap: 12px; }
 .brand h1 { font-size: 22px; letter-spacing: -0.02em; }
 .brand small { color: var(--muted); font-size: 12px; }

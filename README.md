@@ -14,6 +14,8 @@ Dashboard financeiro interativo para pequenos negócios: fluxo de caixa, contas 
 
 - **Importar extrato (CSV):** reconhece delimitador (`;`, `,` ou tab), datas e valores no formato brasileiro, colunas de Débito/Crédito e arquivos em UTF-8 ou Windows-1252. Categoriza automaticamente, sinaliza possíveis duplicados e mostra uma prévia editável antes de importar
 
+- **PWA:** instalável no celular e no desktop (botão "Instalar app"), abre offline depois do primeiro acesso e mostra um aviso quando estiver sem conexão
+
 ## Stack
 
 React 18 · TypeScript · Vite · Recharts · Zustand (com `persist`)
@@ -32,6 +34,12 @@ Build de produção: `npm run build`.
 - Abas carregadas sob demanda (`React.lazy` + `Suspense`)
 - React e Recharts em chunks separados (melhor cache entre deploys)
 - Bundle inicial caiu de um único arquivo de ~610 kB para chunks menores, sem o aviso de tamanho do Vite
+
+## PWA
+
+- `public/manifest.webmanifest` e `public/sw.js` (cache offline; ao publicar mudanças grandes, troque `VERSION` no `sw.js`)
+- Ícones em `public/icons/`, gerados por `python3 scripts/generate-icons.py` (precisa do Pillow)
+- O service worker só é registrado no build de produção, para não atrapalhar o `npm run dev`
 
 ## Testes
 
