@@ -1,5 +1,7 @@
 # Fluxa
 
+[![CI](https://github.com/AlexandreBrito26/Fluxa/actions/workflows/ci.yml/badge.svg)](https://github.com/AlexandreBrito26/Fluxa/actions/workflows/ci.yml)
+
 Dashboard financeiro interativo para pequenos negócios: fluxo de caixa, contas a pagar e a receber, categorias e projeção de saldo. 100% front-end, com dados fictícios salvos no `localStorage`.
 
 ## Funcionalidades
@@ -47,6 +49,8 @@ Build de produção: `npm run build`.
 npm test          # roda uma vez
 npm run test:watch
 ```
+
+A cada push na `main` e a cada pull request, o GitHub Actions (`.github/workflows/ci.yml`) instala as dependências, roda os testes e faz o build com checagem de tipos.
 
 As regras de negócio em `src/lib/finance.ts` (status, saldo, projeção, indicadores, série mensal e CSV) são cobertas com Vitest, usando data fixa para os resultados serem determinísticos.
 
