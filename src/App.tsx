@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { useStore } from './store'
-import Overview from './components/Overview'
-import FlowTab from './components/FlowTab'
-import TransactionsTable from './components/TransactionsTable'
-import CategoriesTab from './components/CategoriesTab'
+
+// Cada aba vira um chunk próprio, carregado só quando é aberta.
+const Overview = lazy(() => import('./components/Overview'))
+const FlowTab = lazy(() => import('./components/FlowTab'))
+const TransactionsTable = lazy(() => import('./components/TransactionsTable'))
+const CategoriesTab = lazy(() => import('./components/CategoriesTab'))
 
 const TABS = [
   { id: 'geral', label: 'Visão geral' },
@@ -55,11 +57,13 @@ export default function App() {
       </nav>
 
       <main>
-        {tab === 'geral' && <Overview />}
-        {tab === 'fluxo' && <FlowTab />}
-        {tab === 'pagar' && <TransactionsTable type="despesa" />}
-        {tab === 'receber' && <TransactionsTable type="receita" />}
-        {tab === 'categorias' && <CategoriesTab />}
+        <Suspense fallback={<div className="loading">Carregando…</div>}>
+          {tab === 'geral' && <Overview />}
+          {tab === 'fluxo' && <FlowTab />}
+          {tab === 'pagar' && <TransactionsTable type="despesa" />}
+          {tab === 'receber' && <TransactionsTable type="receita" />}
+          {tab === 'categorias' && <CategoriesTab />}
+        </Suspense>
       </main>
 
       <footer>Dados fictícios de demonstração, salvos apenas no seu navegador.</footer>

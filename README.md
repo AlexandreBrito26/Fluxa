@@ -24,6 +24,12 @@ npm run dev
 
 Build de produção: `npm run build`.
 
+## Performance
+
+- Abas carregadas sob demanda (`React.lazy` + `Suspense`)
+- React e Recharts em chunks separados (melhor cache entre deploys)
+- Bundle inicial caiu de um único arquivo de ~610 kB para chunks menores, sem o aviso de tamanho do Vite
+
 ## Testes
 
 ```bash

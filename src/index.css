@@ -116,6 +116,8 @@ td { padding: 10px 8px; border-bottom: 1px solid var(--border); }
 .modal .check { display: flex; align-items: center; gap: 8px; color: var(--text); font-size: 13px; }
 .modal .actions { display: flex; justify-content: flex-end; gap: 8px; }
 
+.loading { color: var(--muted); text-align: center; padding: 48px 0; font-size: 14px; }
+
 footer { margin-top: 24px; text-align: center; color: var(--muted); font-size: 12px; }
 
 @media (max-width: 820px) {
