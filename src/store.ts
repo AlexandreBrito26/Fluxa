@@ -14,6 +14,7 @@ interface State {
   budgets: Record<string, number>
   setBudget: (category: string, limit: number | null) => void
   add: (tx: Omit<Transaction, 'id'>) => void
+  addMany: (items: Omit<Transaction, 'id'>[]) => void
   update: (id: string, patch: Partial<Transaction>) => void
   remove: (id: string) => void
   markPaid: (id: string) => void
@@ -57,6 +58,8 @@ export const useStore = create<State>()(
           })
           return { txs: [...s.txs, ...extra] }
         }),
+      addMany: (items) =>
+        set((s) => ({ txs: [...s.txs, ...items.map((t) => ({ ...t, id: uid() }))] })),
       update: (id, patch) =>
         set((s) => ({ txs: s.txs.map((t) => (t.id === id ? { ...t, ...patch } : t)) })),
       remove: (id) => set((s) => ({ txs: s.txs.filter((t) => t.id !== id) })),

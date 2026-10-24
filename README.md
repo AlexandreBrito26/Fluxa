@@ -12,6 +12,8 @@ Dashboard financeiro interativo para pequenos negócios: fluxo de caixa, contas 
 - **Indicadores:** ticket médio, prazo médio de recebimento e inadimplência
 - Tema claro/escuro e layout responsivo
 
+- **Importar extrato (CSV):** reconhece delimitador (`;`, `,` ou tab), datas e valores no formato brasileiro, colunas de Débito/Crédito e arquivos em UTF-8 ou Windows-1252. Categoriza automaticamente, sinaliza possíveis duplicados e mostra uma prévia editável antes de importar
+
 ## Stack
 
 React 18 · TypeScript · Vite · Recharts · Zustand (com `persist`)

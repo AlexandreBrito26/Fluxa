@@ -7,6 +7,7 @@ const FlowTab = lazy(() => import('./components/FlowTab'))
 const TransactionsTable = lazy(() => import('./components/TransactionsTable'))
 const CategoriesTab = lazy(() => import('./components/CategoriesTab'))
 const BudgetTab = lazy(() => import('./components/BudgetTab'))
+const ImportTab = lazy(() => import('./components/ImportTab'))
 
 const TABS = [
   { id: 'geral', label: 'Visão geral' },
@@ -15,6 +16,7 @@ const TABS = [
   { id: 'receber', label: 'Contas a receber' },
   { id: 'categorias', label: 'Categorias' },
   { id: 'metas', label: 'Metas' },
+  { id: 'importar', label: 'Importar' },
 ] as const
 
 type TabId = (typeof TABS)[number]['id']
@@ -66,6 +68,7 @@ export default function App() {
           {tab === 'receber' && <TransactionsTable type="receita" />}
           {tab === 'categorias' && <CategoriesTab />}
           {tab === 'metas' && <BudgetTab />}
+          {tab === 'importar' && <ImportTab />}
         </Suspense>
       </main>
 
