@@ -24,6 +24,15 @@ npm run dev
 
 Build de produção: `npm run build`.
 
+## Testes
+
+```bash
+npm test          # roda uma vez
+npm run test:watch
+```
+
+As regras de negócio em `src/lib/finance.ts` (status, saldo, projeção, indicadores, série mensal e CSV) são cobertas com Vitest, usando data fixa para os resultados serem determinísticos.
+
 ## Estrutura
 
 ```
