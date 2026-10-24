@@ -18,9 +18,17 @@ export default function FlowTab() {
     [txs, initialBalance, period],
   )
   const ind = useMemo(() => indicators(txs), [txs])
+  const firstNegative = series.find((d) => d.projetado && d.saldo < 0)
 
   return (
     <>
+      {firstNegative && (
+        <div className="alerts">
+          <p className="alert red" role="alert">
+            Saldo previsto negativo a partir de {firstNegative.month} ({brl(firstNegative.saldo)}). Revise as despesas agendadas ou antecipe receitas.
+          </p>
+        </div>
+      )}
       <section className="card">
         <div className="toolbar">
           <h3>Fluxo de caixa — realizado e previsto</h3>

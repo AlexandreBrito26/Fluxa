@@ -12,6 +12,34 @@ export interface Transaction {
   dueDate: string // YYYY-MM-DD
   paidDate?: string // YYYY-MM-DD
   recurring: boolean
+  /** Conta onde o lançamento acontece. Ausente = conta corrente principal. */
+  accountId?: string
+  /** Conferido com o extrato bancário (conciliação). */
+  reconciled?: boolean
+  /** Observação livre do lançamento. */
+  note?: string
+  /** Comprovante (imagem ou PDF pequeno), guardado como data URL. */
+  attachment?: { name: string; dataUrl: string }
+}
+
+/** Id reservado da conta corrente principal (saldo inicial em `initialBalance`). */
+export const PRINCIPAL = 'principal'
+
+/** Conta extra (carteira, caixa, cartão). Seu saldo inicial já entra em `initialBalance`. */
+export interface Account {
+  id: string
+  name: string
+  initial: number
+}
+
+/** Transferência entre contas: move dinheiro sem alterar o saldo total nem receitas/despesas. */
+export interface Transfer {
+  id: string
+  date: string // YYYY-MM-DD
+  fromId: string
+  toId: string
+  amount: number
+  description: string
 }
 
 export const CATEGORIES: Record<TxType, string[]> = {

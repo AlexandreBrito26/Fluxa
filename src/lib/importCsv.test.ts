@@ -183,3 +183,16 @@ describe('toTransaction', () => {
     expect(t.paidDate).toBeUndefined()
   })
 })
+
+describe('toTransaction (conciliação)', () => {
+  it('lançamento importado do extrato já vem marcado como conferido', () => {
+    const t = toTransaction({
+      date: '2026-10-10',
+      description: 'VERCEL PRO',
+      amount: 110,
+      type: 'despesa',
+      category: 'Tecnologia',
+    })
+    expect(t.reconciled).toBe(true)
+  })
+})

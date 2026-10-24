@@ -11,6 +11,7 @@ import {
   openTotal,
 } from '../lib/finance'
 import CashFlowChart from './CashFlowChart'
+import AccountsPanel from './AccountsPanel'
 
 function Kpi({ label, value, tone }: { label: string; value: string; tone?: 'green' | 'red' | 'amber' }) {
   return (
@@ -41,6 +42,8 @@ export default function Overview() {
         <Kpi label="A receber (em aberto)" value={brl(openTotal(txs, 'receita'))} />
         <Kpi label="Em atraso" value={brl(openTotal(txs, 'despesa', 'atrasado') + openTotal(txs, 'receita', 'atrasado'))} tone="amber" />
       </div>
+
+      <AccountsPanel />
 
       <div className="grid-2">
         <section className="card">

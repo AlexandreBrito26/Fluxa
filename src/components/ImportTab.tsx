@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useStore } from '../store'
 import { brl, fmtDate } from '../lib/finance'
 import { categorize, parseStatement, sampleStatement, toTransaction, type ParsedRow } from '../lib/importCsv'
+import { isOfx, parseOfx } from '../lib/importOfx'
 import { CATEGORIES, type TxType } from '../types'
 
 interface Draft extends ParsedRow {
@@ -26,7 +27,7 @@ export default function ImportTab() {
   const [message, setMessage] = useState('')
 
   const load = (text: string, name: string) => {
-    const res = parseStatement(text, txs)
+    const res = isOfx(text, name) ? parseOfx(text, txs) : parseStatement(text, txs)
     setDrafts(res.rows.map((r, i) => ({ ...r, key: i, include: !r.duplicate })))
     setErrors(res.errors)
     setFileName(name)
@@ -72,7 +73,7 @@ export default function ImportTab() {
   return (
     <section className="card">
       <div className="toolbar">
-        <h3>Importar extrato (CSV)</h3>
+        <h3>Importar extrato (CSV ou OFX)</h3>
         <div className="spacer" />
         <button className="ghost" onClick={() => load(sampleStatement(), 'extrato-exemplo.csv')}>
           Carregar exemplo
@@ -82,13 +83,14 @@ export default function ImportTab() {
         </button>
         <label className="file-btn">
           Escolher arquivo
-          <input type="file" accept=".csv,.txt,text/csv,text/plain" onChange={onFile} hidden />
+          <input type="file" accept=".csv,.txt,.ofx,.qfx,text/csv,text/plain" onChange={onFile} hidden />
         </label>
       </div>
 
       <p className="footnote">
-        Colunas aceitas: <strong>Data</strong>, <strong>Descrição</strong> (ou Histórico) e{' '}
-        <strong>Valor</strong> (negativo = despesa) — ou colunas separadas de Débito e Crédito. Os
+        CSV: colunas <strong>Data</strong>, <strong>Descrição</strong> (ou Histórico) e{' '}
+        <strong>Valor</strong> (negativo = despesa), ou Débito e Crédito separados. OFX/QFX: exportado
+        pelo internet banking, lido direto. Os
         lançamentos são categorizados automaticamente e você revisa antes de importar. Nada sai do seu
         navegador.
       </p>

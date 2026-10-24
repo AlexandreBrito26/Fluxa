@@ -190,7 +190,8 @@ function typeFromLabel(label: string): TxType | null {
   return null
 }
 
-const dupKey = (type: string, date: string, amount: number, description: string) =>
+/** Chave para detectar possível duplicado (mesma data, valor e descrição). */
+export const dupKey = (type: string, date: string, amount: number, description: string) =>
   `${type}|${date}|${amount.toFixed(2)}|${norm(description)}`
 
 /**
@@ -294,6 +295,8 @@ export function toTransaction(
     dueDate: r.date,
     paidDate: r.date <= iso(new Date()) ? r.date : undefined,
     recurring: false,
+    // veio direto do extrato, então já está conferido
+    reconciled: true,
   }
 }
 

@@ -1,4 +1,4 @@
-import type { Transaction, TxStatus, TxType } from '../types'
+import { PRINCIPAL, type Account, type Transaction, type Transfer, type TxStatus, type TxType } from '../types'
 
 export const brl = (n: number) =>
   n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
@@ -132,8 +132,9 @@ export function budgetUsage(
   txs: Transaction[],
   budgets: Record<string, number>,
   categories: string[],
+  month: string = monthOf(iso(new Date())),
 ): BudgetRow[] {
-  const key = monthOf(iso(new Date()))
+  const key = month
   return categories.map((category) => {
     const spent = sum(
       txs.filter(
@@ -180,4 +181,75 @@ export function toCSV(txs: Transaction[]) {
   return [head, ...rows]
     .map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(';'))
     .join('\n')
+}
+
+export interface AccountBalance {
+  id: string
+  name: string
+  balance: number
+}
+
+/**
+ * Saldo de cada conta. A conta corrente principal recebe o que sobra de
+ * `initialBalance` depois das contas extras. Transferências movem valor entre
+ * contas e, somadas, não alteram o total.
+ */
+export function accountBalances(
+  txs: Transaction[],
+  transfers: Transfer[],
+  accounts: Account[],
+  initialBalance: number,
+): AccountBalance[] {
+  const extrasInitial = accounts.reduce((acc, a) => acc + a.initial, 0)
+  const list = [
+    { id: PRINCIPAL, name: 'Conta corrente', initial: initialBalance - extrasInitial },
+    ...accounts.map((a) => ({ id: a.id, name: a.name, initial: a.initial })),
+  ]
+  return list.map((a) => {
+    const fromTxs = txs
+      .filter((t) => t.paidDate && (t.accountId ?? PRINCIPAL) === a.id)
+      .reduce((acc, t) => acc + signed(t), 0)
+    const received = sum2(transfers.filter((x) => x.toId === a.id).map((x) => x.amount))
+    const sent = sum2(transfers.filter((x) => x.fromId === a.id).map((x) => x.amount))
+    return { id: a.id, name: a.name, balance: Math.round((a.initial + fromTxs + received - sent) * 100) / 100 }
+  })
+}
+
+const sum2 = (values: number[]) => values.reduce((acc, v) => acc + v, 0)
+
+export interface MonthReport {
+  month: string // YYYY-MM
+  entradas: number
+  saidas: number
+  saldo: number
+  porCategoria: { category: string; total: number }[]
+  lancamentos: Transaction[]
+}
+
+/**
+ * Resumo de um mês (YYYY-MM). Entradas e saídas contam só o que foi pago/recebido;
+ * as categorias de despesa contam tudo que vence no mês.
+ */
+export function monthReport(txs: Transaction[], month: string): MonthReport {
+  const eff = (t: Transaction) => t.paidDate ?? t.dueDate
+  const inMonth = txs
+    .filter((t) => monthOf(eff(t)) === month)
+    .sort((a, b) => eff(a).localeCompare(eff(b)))
+  const entradas = sum(inMonth.filter((t) => t.type === 'receita' && t.paidDate))
+  const saidas = sum(inMonth.filter((t) => t.type === 'despesa' && t.paidDate))
+  const map = new Map<string, number>()
+  inMonth
+    .filter((t) => t.type === 'despesa')
+    .forEach((t) => map.set(t.category, (map.get(t.category) ?? 0) + t.amount))
+  const porCategoria = [...map.entries()]
+    .map(([category, total]) => ({ category, total: Math.round(total * 100) / 100 }))
+    .sort((a, b) => b.total - a.total)
+  return {
+    month,
+    entradas: Math.round(entradas * 100) / 100,
+    saidas: Math.round(saidas * 100) / 100,
+    saldo: Math.round((entradas - saidas) * 100) / 100,
+    porCategoria,
+    lancamentos: inMonth,
+  }
 }
